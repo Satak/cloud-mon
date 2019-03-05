@@ -1,0 +1,15 @@
+monitors:
+  name1:
+    name: name1
+    base_url: "https://some-url"
+    login_path: "/api/v1/login"
+    monitor_path: "/api/v1/some-route"
+    username: username
+    password: "encryptedPassword=="
+  name2:
+    name: name2
+    base_url: "https://some-url2"
+    login_path: "/api/v1/login"
+    monitor_path: "/api/v1/some-route"
+    username: username
+    password: "encryptedPassword=="
