@@ -6,36 +6,36 @@
     <div class="row">
       <div class="input-field col s6">
         <i class="material-icons prefix">web</i>
-        <input id="name" type="text" class="validate">
+        <input id="name" type="text" class="validate" value="{{monitor.name}}">
         <label for="name">Monitor Name</label>
       </div>
       <div class="input-field col s6">
         <i class="material-icons prefix">domain</i>
-        <input placeholder="https://some-url" id="base_url" type="text" class="validate">
+        <input placeholder="https://some-url" id="base_url" type="text" class="validate" value="{{monitor.base_url}}">
         <label for="base_url">Base URL</label>
       </div>
     </div>
     <div class="row">
       <div class="input-field col s6">
         <i class="material-icons prefix">account_circle</i>
-        <input id="username" type="text" class="validate">
+        <input id="username" type="text" class="validate" value="{{monitor.username}}">
         <label for="username">Username</label>
       </div>
       <div class="input-field col s6">
         <i class="material-icons prefix">lock</i>
-        <input id="password" type="password" class="validate">
+        <input id="password" type="password" class="validate" value="{{monitor.password}}">
         <label for="password">Password</label>
       </div>
     </div>
     <div class="row">
       <div class="input-field col s6">
         <i class="material-icons prefix">web</i>
-        <input placeholder="/api/v1/login" id="login_path" type="text" class="validate">
+        <input placeholder="/api/v1/login" id="login_path" type="text" class="validate" value="{{monitor.login_path}}">
         <label for="login_path">Login Path</label>
       </div>
       <div class="input-field col s6">
         <i class="material-icons prefix">web</i>
-        <input placeholder="/api/v1/some-route" id="monitor_path" type="text" class="validate">
+        <input placeholder="/api/v1/some-route" id="monitor_path" type="text" class="validate" value="{{monitor.monitor_path}}">
         <label for="monitor_path">Monitor Path</label>
       </div>
     </div>
@@ -44,7 +44,7 @@
         <div class="switch">
           <label>
             Disabled
-            <input type="checkbox" checked id="monitorEnabled" name="monitorEnabled">
+            <input type="checkbox" checked id="monitorEnabled" name="monitorEnabled" {% if monitor.enabled %}checked{% endif %}>
             <span class="lever"></span>
             Enabled
           </label>
@@ -66,5 +66,6 @@
     </div>
 
   </form>
+
 </div>
 {% endblock %}

@@ -32,7 +32,7 @@ def api_test():
         logging.error(str(err))
         return jsonify({'error': str(err)}), 400
 
-    monitor = Monitor(**json_data, plain_txt_pw=True)
+    monitor = Monitor(**json_data)
     monitor.monitor()
     return jsonify({'success': monitor.ok})
 
@@ -65,8 +65,8 @@ def api_delete_monitor(monitor_name):
     return jsonify(data), data['status_code']
 
 
-@app.route('/api/scheduled-monitor')
-def api_scheduled_monitor():
+@app.route('/api/invoke-monitor')
+def api_invoke_monitor():
     data = monitor_all()
     return jsonify(data)
 
@@ -79,7 +79,14 @@ def view_index():
 
 @app.route('/add-monitor')
 def view_add_monitor():
-    return render_template('monitor_form.html')
+    return render_template('monitor_form.html', monitor=None)
+
+
+@app.route('/monitor/<string:monitor_name>')
+def view_modify_monitor(monitor_name):
+    monitor = get_data(monitor_name=monitor_name)
+    print(monitor)
+    return render_template('monitor_form.html', monitor=monitor)
 
 
 if __name__ == '__main__':

@@ -5,14 +5,14 @@ from datetime import datetime
 
 
 class Monitor:
-    def __init__(self, name, enabled, base_url, login_path, monitor_path, username, password, created=None, last_check=None, plain_txt_pw=False):
+    def __init__(self, name, enabled, base_url, login_path, monitor_path, username, password, created=None, last_check=None):
         self.name = name
         self.enabled = enabled
         self.base_url = base_url
         self.login_path = login_path
         self.monitor_path = monitor_path
         self.username = username
-        self.password = password if plain_txt_pw else self._decrypt_password(password)
+        self.password = self._encrypt_password(password)
         self.last_check = last_check if last_check else datetime.utcnow()
         self.created = created if created else datetime.utcnow()
         self.token = self._login()
@@ -29,7 +29,7 @@ class Monitor:
     def _credentials(self):
         return {
             'username': self.username,
-            'password': self.password
+            'password': self._decrypt_password(self.password)
         }
 
     @property
@@ -55,6 +55,17 @@ class Monitor:
         except Exception as err:
             logging.error(f'Decryption failed for {self.name}, {err}')
 
+    def _encrypt_password(self, plain_text_password):
+        data = {
+            'action': 'encrypt',
+            'key': DECRYPTION_KEY,
+            'data': plain_text_password
+        }
+        try:
+            return requests.post(DECRYPTION_URL, json=data, timeout=TIMEOUT).json()['data']
+        except Exception as err:
+            logging.error(f'Encryption failed for {self.name}, {err}')
+
     def _login(self):
         try:
             return requests.post(self._login_url, json=self._credentials, timeout=TIMEOUT).json()['token']
@@ -72,8 +83,8 @@ class Monitor:
         except Exception as err:
             logging.error(f'Monitoring failed for {self.name}, {err}')
 
-    def as_dict(self):
-        return {
+    def as_dict(self, password=False):
+        dict_data = {
             'name': self.name,
             'enabled': self.enabled,
             'base_url': self.base_url,
@@ -83,8 +94,12 @@ class Monitor:
             'ok': self.ok,
             'status_code': self.status_code,
             'last_check': str(self.last_check),
-            'created': str(self.created)
+            'created': str(self.created),
+            'password': self.password
         }
+        if not password:
+            del dict_data['password']
+        return dict_data
 
     def __repr__(self):
         return f'{self.name} {self._state_str}'

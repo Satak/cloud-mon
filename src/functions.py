@@ -5,6 +5,8 @@ from conf import CONF_FILE, DECRYPTION_KEY, DECRYPTION_URL, TIMEOUT
 from monitor import Monitor
 from datetime import datetime
 from datastore import get_data
+from pprint import pprint
+from datastore import update_monitor_data
 
 
 def load_conf_file(file_name):
@@ -16,9 +18,10 @@ def monitor_all():
     # same last_check for all monitors
     now = datetime.utcnow()
     data = get_data()
-    monitors = [Monitor(**value, last_check=now) for key, value in data['monitors'].items() if key.get('enabled')]
+    monitors = [Monitor(**item, last_check=now) for item in data if item.get('enabled')]
     for monitor in monitors:
         monitor.monitor()
+        update_monitor_data(monitor.as_dict(password=True))
     return {'data': 'monitoring done'}
 
 

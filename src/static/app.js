@@ -48,7 +48,7 @@ function testMonitor() {
 function addNewMonitor() {
   const url = '/api/monitors'
   const body = getNewMonitorFormData()
-  API(body, url).then(response => console.log(response)).catch(alert)
+  API(body, url).then(response => redirectToIndex()).catch(alert)
 }
 
 async function deleteMonitor(monitorName) {
@@ -58,9 +58,14 @@ async function deleteMonitor(monitorName) {
   }
   const response = await fetch(url, requestParams)
   if (response.ok) {
+    document.location.reload()
     console.log('Deleted')
   } else {
     const err = await response.json()
     alert(err)
   }
+}
+
+function redirectToIndex() {
+  document.location = '/'
 }

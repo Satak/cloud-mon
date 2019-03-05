@@ -17,7 +17,7 @@
   <tbody>
     {% for monitor in monitors %}
     <tr>
-      <td>{{monitor.name}}</td>
+      <td><a href="{{ url_for('view_modify_monitor', monitor_name=monitor.name) }}">{{monitor.name}}</a></td>
       <td>
         <div class="switch">
           <label>
@@ -26,14 +26,24 @@
           </label>
         </div>
       </td>
-      <td>{{monitor.base_url}}</td>
+      <td><a href="{{monitor.base_url}}">{{monitor.base_url}}</a></td>
       <td>{{monitor.login_path}}</td>
       <td>{{monitor.monitor_path}}</td>
       <td>{{monitor.username}}</td>
       <td>{{monitor.created}}</td>
       <td>{{monitor.last_check}}</td>
-      <td>{{monitor.ok}}</td>
-      <td><button class="btn red btn-small" onclick="deleteMonitor('{{monitor.name}}')">Delete</button></td>
+      <td>
+        {% if monitor.ok == True %}
+        <i class="material-icons small green-text">check_circle</i>
+        {% elif monitor.ok == False %}
+        <i class="material-icons small red-text">error</i>
+        {% else %}
+        <i class="material-icons small grey-text">check_circle</i>
+        {% endif %}
+      </td>
+      <td>
+        <a class="btn-floating red" onclick="deleteMonitor('{{monitor.name}}')"><i class="material-icons">delete_forever</i></a>
+      </td>
     </tr>
     {% endfor %}
   </tbody>

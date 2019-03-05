@@ -6,6 +6,17 @@ from conf import NAMESPACE
 client = datastore.Client(namespace=NAMESPACE)
 
 
+def update_monitor_data(data, kind='monitor'):
+    try:
+        with client.transaction():
+            item = datastore.Entity(key=client.key(kind, data['name']))
+            item.update(data)
+            client.put(item)
+        return {'data': dict(item), 'status_code': 200}
+    except Exception as err:
+        return {'error': str(err), 'status_code': 400}
+
+
 def add_data(data, kind='monitor'):
     record = get_data(monitor_name=data['name'], kind=kind)
     if record:
