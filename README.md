@@ -1,6 +1,6 @@
-# Webmon
+# CloudMon
 
-Monitors URLs defined in the `data.yaml`. WIP.
+Monitors URLs defined in the `data.yaml`. This is a work in progress project.
 
 ## To Do
 
