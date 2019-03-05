@@ -4,6 +4,9 @@ from monitor import Monitor
 from datetime import datetime
 
 
+# TODO: flask
+
+
 def load_conf_file(file_name):
     with open(file_name) as file:
         return yaml.load(file)
