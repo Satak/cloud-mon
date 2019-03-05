@@ -2,11 +2,18 @@
 
 Monitors URLs defined in the `data.yaml`. This is a work in progress project.
 
-## To Do
+## Web application server
 
-- data to GCP datastore
-- flask wrapping
-- UI
+`Flask`
+
+## UI
+
+![UI Main](/img/cloud_mon_ui.png)
+![UI Form](/img/cloud_mon_ui_form.png)
+
+## Authentication
+
+Basic auth + token
 
 ## Dependencies
 
@@ -55,4 +62,4 @@ monitors:
 
 This is the implementation high level plan
 
-![Architecure](/img/webmon.png)
+![Architecure](/img/architecure.png)
