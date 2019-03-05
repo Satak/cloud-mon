@@ -9,6 +9,9 @@ MONITOR_SCHEMA = {
             'maxLength': 30,
             "pattern": "^[A-Za-z0-9]*$"
         },
+        'enabled': {
+            'type': 'boolean'
+        },
         'base_url': {
             'type': 'string',
             'minLength': 5,
@@ -37,6 +40,7 @@ MONITOR_SCHEMA = {
     },
     'required': [
         'name',
+        'enabled',
         'base_url',
         'login_path',
         'monitor_path',

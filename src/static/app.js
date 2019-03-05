@@ -17,6 +17,7 @@ async function API(body, url) {
 function getNewMonitorFormData() {
   return {
     name: document.getElementById("name").value,
+    enabled: document.getElementById("monitorEnabled").checked,
     base_url: document.getElementById("base_url").value,
     login_path: document.getElementById("login_path").value,
     monitor_path: document.getElementById("monitor_path").value,
@@ -48,4 +49,18 @@ function addNewMonitor() {
   const url = '/api/monitors'
   const body = getNewMonitorFormData()
   API(body, url).then(response => console.log(response)).catch(alert)
+}
+
+async function deleteMonitor(monitorName) {
+  const url = `/api/monitors/${monitorName}`
+  const requestParams = {
+    method: 'DELETE'
+  }
+  const response = await fetch(url, requestParams)
+  if (response.ok) {
+    console.log('Deleted')
+  } else {
+    const err = await response.json()
+    alert(err)
+  }
 }

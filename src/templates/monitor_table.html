@@ -10,6 +10,7 @@
       <th>Created</th>
       <th>Last Check</th>
       <th>OK</th>
+      <th>Delete</th>
     </tr>
   </thead>
 
@@ -17,7 +18,14 @@
     {% for monitor in monitors %}
     <tr>
       <td>{{monitor.name}}</td>
-      <td>{{monitor.enabled}}</td>
+      <td>
+        <div class="switch">
+          <label>
+            <input type="checkbox" {% if monitor.enabled %}checked{% endif %} disabled>
+            <span class="lever"></span>
+          </label>
+        </div>
+      </td>
       <td>{{monitor.base_url}}</td>
       <td>{{monitor.login_path}}</td>
       <td>{{monitor.monitor_path}}</td>
@@ -25,6 +33,7 @@
       <td>{{monitor.created}}</td>
       <td>{{monitor.last_check}}</td>
       <td>{{monitor.ok}}</td>
+      <td><button class="btn red btn-small" onclick="deleteMonitor('{{monitor.name}}')">Delete</button></td>
     </tr>
     {% endfor %}
   </tbody>

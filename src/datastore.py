@@ -26,3 +26,12 @@ def get_data(monitor_name=None, kind='monitor'):
         item = client.get(key=key)
         return dict(item) if item else None
     return [dict(item) for item in client.query(kind=kind).fetch() if item]
+
+
+def delete_data(monitor_name, kind='monitor'):
+    try:
+        item = client.key(kind, monitor_name)
+        client.delete(item)
+        return {'data': {}, 'status_code': 204}
+    except Exception as err:
+        return {'error': str(err), 'status_code': 400}

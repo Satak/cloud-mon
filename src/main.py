@@ -2,8 +2,8 @@ from flask import Flask, request, jsonify, render_template, session
 from monitor import Monitor
 from validators import validate_monitor
 import logging
-from datastore import add_data, get_data
-from functions import encrypt
+from datastore import add_data, get_data, delete_data
+from functions import encrypt, monitor_all
 from datetime import datetime
 
 app = Flask(__name__)
@@ -57,6 +57,18 @@ def api_get_monitors(monitor_name=None):
     data = get_data(monitor_name=monitor_name)
     status_code = 200 if data else 404
     return jsonify(data), status_code
+
+
+@app.route('/api/monitors/<string:monitor_name>', methods=['DELETE'])
+def api_delete_monitor(monitor_name):
+    data = delete_data(monitor_name)
+    return jsonify(data), data['status_code']
+
+
+@app.route('/api/scheduled-monitor')
+def api_scheduled_monitor():
+    data = monitor_all()
+    return jsonify(data)
 
 
 @app.route('/')

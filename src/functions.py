@@ -4,6 +4,7 @@ import requests
 from conf import CONF_FILE, DECRYPTION_KEY, DECRYPTION_URL, TIMEOUT
 from monitor import Monitor
 from datetime import datetime
+from datastore import get_data
 
 
 def load_conf_file(file_name):
@@ -12,13 +13,13 @@ def load_conf_file(file_name):
 
 
 def monitor_all():
-    # same datetime for all monitors
+    # same last_check for all monitors
     now = datetime.utcnow()
-    data = load_conf_file(CONF_FILE)
-    monitors = [Monitor(**value, timestamp=now) for key, value in data['monitors'].items()]
+    data = get_data()
+    monitors = [Monitor(**value, last_check=now) for key, value in data['monitors'].items() if key.get('enabled')]
     for monitor in monitors:
         monitor.monitor()
-        print(monitor.as_dict())
+    return {'data': 'monitoring done'}
 
 
 def encrypt(data):

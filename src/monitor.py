@@ -5,14 +5,16 @@ from datetime import datetime
 
 
 class Monitor:
-    def __init__(self, name, base_url, login_path, monitor_path, username, password, timestamp=None, plain_txt_pw=False):
+    def __init__(self, name, enabled, base_url, login_path, monitor_path, username, password, created=None, last_check=None, plain_txt_pw=False):
         self.name = name
+        self.enabled = enabled
         self.base_url = base_url
         self.login_path = login_path
         self.monitor_path = monitor_path
         self.username = username
         self.password = password if plain_txt_pw else self._decrypt_password(password)
-        self.timestamp = timestamp if timestamp else datetime.utcnow()
+        self.last_check = last_check if last_check else datetime.utcnow()
+        self.created = created if created else datetime.utcnow()
         self.token = self._login()
         self.ok = False
         self.status_code = None
@@ -73,10 +75,15 @@ class Monitor:
     def as_dict(self):
         return {
             'name': self.name,
-            'baseUrl': self.base_url,
+            'enabled': self.enabled,
+            'base_url': self.base_url,
+            'login_path': self.login_path,
+            'monitor_path': self.monitor_path,
+            'username': self.username,
             'ok': self.ok,
-            'statusCode': self.status_code,
-            'timestamp': str(self.timestamp)
+            'status_code': self.status_code,
+            'last_check': str(self.last_check),
+            'created': str(self.created)
         }
 
     def __repr__(self):
