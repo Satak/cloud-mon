@@ -62,4 +62,4 @@ monitors:
 
 This is the implementation high level plan
 
-![Architecure](/img/architecure.png)
+![Architecture](/img/architecture.png)
