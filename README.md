@@ -10,11 +10,11 @@ Monitors URLs defined in the `data.yaml`. This is a work in progress project.
 
 ## Dependencies
 
-- Encryption API to encrypt passwords
 - `requests` library
 - `yaml` library
-- `DECRYPTION_KEY` encryption key environment variable
-- `ENCRYPTION_URL` encryption url environment variable
+- Access to some decryption API to decrypt passwords
+  - `DECRYPTION_KEY` environment variable
+  - `DECRYPTION_URL` environment variable
 
 ## `data.yaml` file
 

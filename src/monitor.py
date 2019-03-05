@@ -1,6 +1,6 @@
 import logging
 import requests
-from conf import DECRYPTION_KEY, ENCRYPTION_URL, TIMEOUT
+from conf import DECRYPTION_KEY, DECRYPTION_URL, TIMEOUT
 
 
 class Monitor:
@@ -48,7 +48,7 @@ class Monitor:
             'data': encrypted_password
         }
         try:
-            return requests.post(ENCRYPTION_URL, json=data, timeout=TIMEOUT).json()['data']
+            return requests.post(DECRYPTION_URL, json=data, timeout=TIMEOUT).json()['data']
         except Exception as err:
             logging.error(f'Decryption failed for {self.name}, {err}')
 
