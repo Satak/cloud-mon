@@ -1,0 +1,31 @@
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Enabled</th>
+      <th>Base URL</th>
+      <th>Login Path</th>
+      <th>Monitor Path</th>
+      <th>Username</th>
+      <th>Created</th>
+      <th>Last Check</th>
+      <th>OK</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for monitor in monitors %}
+    <tr>
+      <td>{{monitor.name}}</td>
+      <td>{{monitor.enabled}}</td>
+      <td>{{monitor.base_url}}</td>
+      <td>{{monitor.login_path}}</td>
+      <td>{{monitor.monitor_path}}</td>
+      <td>{{monitor.username}}</td>
+      <td>{{monitor.created}}</td>
+      <td>{{monitor.last_check}}</td>
+      <td>{{monitor.ok}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

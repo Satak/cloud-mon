@@ -1,17 +1,18 @@
 import logging
 import requests
 from conf import DECRYPTION_KEY, DECRYPTION_URL, TIMEOUT
+from datetime import datetime
 
 
 class Monitor:
-    def __init__(self, name, base_url, login_path, monitor_path, username, password, timestamp):
+    def __init__(self, name, base_url, login_path, monitor_path, username, password, timestamp=None, plain_txt_pw=False):
         self.name = name
         self.base_url = base_url
         self.login_path = login_path
         self.monitor_path = monitor_path
         self.username = username
-        self.password = self._decrypt_password(password)
-        self.timestamp = timestamp
+        self.password = password if plain_txt_pw else self._decrypt_password(password)
+        self.timestamp = timestamp if timestamp else datetime.utcnow()
         self.token = self._login()
         self.ok = False
         self.status_code = None
