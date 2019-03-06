@@ -17,21 +17,7 @@ app.config['BASIC_AUTH_FORCE'] = True
 basic_auth = BasicAuth(app)
 
 
-@app.route('/api/test/mockup', methods=['POST', 'GET'])
-def api_test_mockup():
-    '''
-    For dev purposes
-    '''
-    if request.method == 'POST':
-        json_data = request.get_json(silent=True)
-        if json_data['username'] != 'username' or json_data['password'] != 'password':
-            return jsonify({'error': 'Invalid login'}), 401
-        return jsonify({
-            'token': '123'
-        })
-    return jsonify({'data': 'OK'})
-
-
+# API
 @app.route('/api/test', methods=['POST'])
 def api_test():
     try:
@@ -69,6 +55,7 @@ def api_edit_monitor(monitor_name):
 
     password = json_data['password']
     password = encrypt(password) if password else None
+    json_data['password'] = password
     data = modify_data(json_data)
     return jsonify(data), data['status_code']
 
@@ -93,6 +80,7 @@ def api_invoke_monitor():
     return jsonify(data)
 
 
+# Views
 @app.route('/')
 def view_index():
     data = get_data()
