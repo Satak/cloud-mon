@@ -58,6 +58,25 @@ monitors:
     ...
 ```
 
+## `app.yaml` Deployment file
+
+`gcloud app deploy --project=<projectId>`
+
+```yaml
+runtime: python37
+env_variables:
+  DECRYPTION_KEY: <key>
+  DECRYPTION_URL: <url>
+  BASIC_AUTH_USERNAME: <username>
+  BASIC_AUTH_PASSWORD: <strong password>
+  NAMESPACE: <namespace>
+handlers:
+- url: /static
+  static_dir: static/
+- url: /.*
+  script: auto
+```
+
 ## Architecture
 
 This is the implementation high level plan
