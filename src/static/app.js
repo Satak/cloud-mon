@@ -1,6 +1,6 @@
-async function API(body, url) {
+async function API(body, url, method) {
   const requestParams = {
-    method: 'POST',
+    method: method,
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
@@ -29,7 +29,8 @@ function getNewMonitorFormData() {
 function testMonitor() {
   const url = '/api/test'
   const body = getNewMonitorFormData()
-  API(body, url).then(response => {
+  const method = 'POST'
+  API(body, url, method).then(response => {
     const testSuccessIcon = document.getElementById("test_success")
     const testErrorIcon = document.getElementById("test_error")
 
@@ -46,9 +47,17 @@ function testMonitor() {
 }
 
 function addNewMonitor() {
+  const method = 'POST'
   const url = '/api/monitors'
   const body = getNewMonitorFormData()
-  API(body, url).then(response => redirectToIndex()).catch(alert)
+  API(body, url, method).then(_ => redirectToIndex()).catch(alert)
+}
+
+function modifyMonitor(name) {
+  const method = 'PUT'
+  const url = `/api/monitors/${name}`
+  const body = getNewMonitorFormData()
+  API(body, url, method).then(_ => redirectToIndex()).catch(alert)
 }
 
 async function deleteMonitor(monitorName) {

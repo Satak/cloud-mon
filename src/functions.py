@@ -34,4 +34,4 @@ def encrypt(data):
         }
         return requests.post(DECRYPTION_URL, json=json_data, timeout=TIMEOUT).json()['data']
     except Exception as err:
-        logging.error(str(err))
+        logging.error(f'Encryption failed: {err}')

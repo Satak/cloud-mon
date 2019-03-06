@@ -31,6 +31,20 @@ def add_data(data, kind='monitor'):
         return {'error': str(err), 'status_code': 400}
 
 
+def modify_data(data, kind='monitor'):
+    record = get_data(monitor_name=data['name'], kind=kind)
+    if not record:
+        return {'error': f'Record {record["name"]} not found', 'status_code': 404}
+    try:
+        with client.transaction():
+            item = datastore.Entity(key=client.key(kind, data['name']))
+            item.update(data)
+            client.put(item)
+        return {'data': dict(item), 'status_code': 201}
+    except Exception as err:
+        return {'error': str(err), 'status_code': 400}
+
+
 def get_data(monitor_name=None, kind='monitor'):
     if monitor_name:
         key = client.key(kind, monitor_name)

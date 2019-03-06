@@ -1,12 +1,20 @@
 from flask import Flask, request, jsonify, render_template, session
+from flask_basicauth import BasicAuth
 from monitor import Monitor
 from validators import validate_monitor
 import logging
-from datastore import add_data, get_data, delete_data
+from datastore import add_data, get_data, delete_data, modify_data
 from functions import encrypt, monitor_all
 from datetime import datetime
+from conf import BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD
 
 app = Flask(__name__)
+
+app.config['BASIC_AUTH_USERNAME'] = BASIC_AUTH_USERNAME
+app.config['BASIC_AUTH_PASSWORD'] = BASIC_AUTH_PASSWORD
+app.config['BASIC_AUTH_FORCE'] = True
+
+basic_auth = BasicAuth(app)
 
 
 @app.route('/api/test/mockup', methods=['POST', 'GET'])
@@ -51,6 +59,20 @@ def api_add_monitor():
     return jsonify(data), data['status_code']
 
 
+@app.route('/api/monitors/<string:monitor_name>', methods=['PUT'])
+def api_edit_monitor(monitor_name):
+    try:
+        json_data = validate_monitor(request.get_json(silent=True))
+    except Exception as err:
+        logging.error(str(err))
+        return jsonify({'error': str(err)}), 400
+
+    password = json_data['password']
+    password = encrypt(password) if password else None
+    data = modify_data(json_data)
+    return jsonify(data), data['status_code']
+
+
 @app.route('/api/monitors')
 @app.route('/api/monitors/<string:monitor_name>')
 def api_get_monitors(monitor_name=None):
@@ -79,14 +101,14 @@ def view_index():
 
 @app.route('/add-monitor')
 def view_add_monitor():
-    return render_template('monitor_form.html', monitor=None)
+    return render_template('monitor_form.html', monitor=None, action='add')
 
 
-@app.route('/monitor/<string:monitor_name>')
+@app.route('/monitors/<string:monitor_name>')
 def view_modify_monitor(monitor_name):
     monitor = get_data(monitor_name=monitor_name)
-    print(monitor)
-    return render_template('monitor_form.html', monitor=monitor)
+    del monitor['password']
+    return render_template('monitor_form.html', monitor=monitor, action='edit')
 
 
 if __name__ == '__main__':

@@ -58,13 +58,17 @@
         <i id="test_error" hidden class="material-icons red-text">error</i>
       </div>
       <div class="input-field col s2">
+        {% if action == 'add' %}
         <button class="btn waves-effect waves-light blue" type="button" name="action" onclick="addNewMonitor()">Submit
+        {% else %}
+        <button class="btn waves-effect waves-light blue" type="button" name="action" onclick="modifyMonitor('{{monitor.name}}')">Submit
           <i class="material-icons left">send</i>
         </button>
+        {% endif %}
       </div>
 
     </div>
-
+    
   </form>
 
 </div>

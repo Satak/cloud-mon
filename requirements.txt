@@ -1,2 +1,6 @@
+flask
+Flask-BasicAuth
 requests
 pyaml
+fastjsonschema
+google-cloud-datastore
