@@ -13,7 +13,7 @@ class Monitor:
         self.monitor_path = monitor_path
         self.username = username
         self.password = self._encrypt_password(password) if plain_pw else password
-        self.last_check = last_check if last_check else datetime.utcnow()
+        self.last_check = datetime.utcnow()
         self.created = created if created else datetime.utcnow()
         self.token = self._login()
         self.ok = ok

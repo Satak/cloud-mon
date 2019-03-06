@@ -16,7 +16,7 @@ def load_conf_file(file_name):
 
 def monitor_all():
     # same last_check for all monitors
-    now = datetime.utcnow()
+    now = datetime.utcnow
     data = get_data()
     # import pdb; pdb.set_trace()
     monitors = [Monitor(**item, plain_pw=False) for item in data if item.get('enabled')]
