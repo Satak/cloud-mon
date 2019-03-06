@@ -80,5 +80,8 @@ function redirectToIndex() {
 }
 
 function invokeMonitor() {
-  console.log('monitoring')
+  const method = 'PUT'
+  const url = '/api/invoke-monitor'
+  const body = {}
+  API(body, url, method).then(_ => redirectToIndex()).catch(alert)
 }

@@ -5,19 +5,19 @@ from datetime import datetime
 
 
 class Monitor:
-    def __init__(self, name, enabled, base_url, login_path, monitor_path, username, password, created=None, last_check=None):
+    def __init__(self, name, enabled, base_url, login_path, monitor_path, username, password, created=None, last_check=None, ok=None, status_code=None, plain_pw=True):
         self.name = name
         self.enabled = enabled
         self.base_url = base_url
         self.login_path = login_path
         self.monitor_path = monitor_path
         self.username = username
-        self.password = self._encrypt_password(password)
+        self.password = self._encrypt_password(password) if plain_pw else password
         self.last_check = last_check if last_check else datetime.utcnow()
         self.created = created if created else datetime.utcnow()
         self.token = self._login()
-        self.ok = False
-        self.status_code = None
+        self.ok = ok
+        self.status_code = status_code
 
     @property
     def _headers(self):
@@ -75,12 +75,16 @@ class Monitor:
     def monitor(self):
         if not self.token:
             logging.error(f'No token for {self.name}')
+            self.ok = False
+            self.status_code = None
             return None
         try:
             r = requests.get(self._monitor_url, headers=self._headers, timeout=TIMEOUT)
             self.ok = r.ok
             self.status_code = r.status_code
         except Exception as err:
+            self.ok = False
+            self.status_code = None
             logging.error(f'Monitoring failed for {self.name}, {err}')
 
     def as_dict(self, password=False):

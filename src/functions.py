@@ -18,7 +18,8 @@ def monitor_all():
     # same last_check for all monitors
     now = datetime.utcnow()
     data = get_data()
-    monitors = [Monitor(**item, last_check=now) for item in data if item.get('enabled')]
+    # import pdb; pdb.set_trace()
+    monitors = [Monitor(**item, plain_pw=False) for item in data if item.get('enabled')]
     for monitor in monitors:
         monitor.monitor()
         update_monitor_data(monitor.as_dict(password=True))

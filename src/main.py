@@ -74,7 +74,7 @@ def api_delete_monitor(monitor_name):
     return jsonify(data), data['status_code']
 
 
-@app.route('/api/invoke-monitor')
+@app.route('/api/invoke-monitor', methods=['PUT'])
 def api_invoke_monitor():
     data = monitor_all()
     return jsonify(data)
