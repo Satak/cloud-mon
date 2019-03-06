@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, session
+from flask import Flask, request, jsonify, render_template
 from flask_basicauth import BasicAuth
 from monitor import Monitor
 from validators import validate_monitor

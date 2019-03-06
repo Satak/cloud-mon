@@ -78,3 +78,7 @@ async function deleteMonitor(monitorName) {
 function redirectToIndex() {
   document.location = '/'
 }
+
+function invokeMonitor() {
+  console.log('monitoring')
+}
