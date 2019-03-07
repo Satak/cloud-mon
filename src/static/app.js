@@ -88,7 +88,7 @@ function redirectToIndex() {
 
 function invokeMonitor() {
   const method = 'PUT'
-  const url = '/api/invoke-monitor'
+  const url = '/api/ui-invoke-monitor'
   const body = {}
   API(body, url, method).then(_ => redirectToIndex()).catch(alert)
 }

@@ -91,6 +91,14 @@ def api_invoke_monitor():
     return jsonify(data)
 
 
+@app.route('/api/ui-invoke-monitor', methods=['PUT'])
+@basic_auth.required
+def api_ui_invoke_monitor():
+    data = monitor_all()
+    logging.info('Monitoring done launched from UI')
+    return jsonify(data)
+
+
 @app.route('/api/status')
 def api_status():
     logging.info('Status check')
