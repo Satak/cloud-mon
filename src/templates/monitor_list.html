@@ -1,0 +1,20 @@
+<ul class="collapsible">
+    {% for monitor in monitors %}
+    <li>
+        <div class="collapsible-header">
+            {% if monitor.ok == True %}
+            <i class="material-icons small green-text">check_circle</i>
+            {% elif monitor.ok == False %}
+            <i class="material-icons small red-text">error</i>
+            {% else %}
+            <i class="material-icons small grey-text">check_circle</i>
+            {% endif %}
+            {{monitor.name}}
+            <span class="badge">{{monitor.last_check}}</span>
+        </div>
+        <div class="collapsible-body">
+            {% include 'monitor_table.html' %}
+        </div>
+    </li>
+    {% endfor %}
+</ul>

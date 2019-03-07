@@ -1,7 +1,7 @@
-<table>
+<table class="responsive-table highlight">
   <thead>
     <tr>
-      <th>Name</th>
+      <th>Edit</th>
       <th>Enabled</th>
       <th>Base URL</th>
       <th>Login Path</th>
@@ -15,16 +15,18 @@
   </thead>
 
   <tbody>
-    {% for monitor in monitors %}
     <tr>
-      <td><a href="{{ url_for('view_modify_monitor', monitor_name=monitor.name) }}">{{monitor.name}}</a></td>
       <td>
-        <div class="switch">
-          <label>
-            <input type="checkbox" {% if monitor.enabled %}checked{% endif %} disabled>
-            <span class="lever"></span>
-          </label>
-        </div>
+        <a href="{{ url_for('view_modify_monitor', monitor_name=monitor.name) }}" class="waves-effect waves-light btn blue">
+          <i class="material-icons">edit</i>
+        </a>
+      </td>
+      <td>
+        {% if monitor.enabled %}
+        <i class="material-icons small green-text">check_circle</i>
+        {% else %}
+        <i class="material-icons small grey-text">check_circle</i>
+        {% endif %}
       </td>
       <td><a href="{{monitor.base_url}}">{{monitor.base_url}}</a></td>
       <td>{{monitor.login_path}}</td>
@@ -45,6 +47,5 @@
         <a class="btn-floating red" onclick="deleteMonitor('{{monitor.name}}')"><i class="material-icons">delete_forever</i></a>
       </td>
     </tr>
-    {% endfor %}
   </tbody>
 </table>
