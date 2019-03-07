@@ -5,7 +5,20 @@ from datetime import datetime
 
 
 class Monitor:
-    def __init__(self, name, enabled, base_url, login_path, monitor_path, username, password, created=None, last_check=None, ok=None, status_code=None, plain_pw=True):
+    def __init__(
+            self,
+            name,
+            enabled,
+            base_url,
+            login_path,
+            monitor_path,
+            username,
+            password,
+            created=None,
+            last_check=None,
+            ok=None,
+            status_code=None,
+            plain_pw=True):
         self.name = name
         self.enabled = enabled
         self.base_url = base_url
@@ -41,7 +54,7 @@ class Monitor:
         return self.base_url + self.login_path
 
     @property
-    def _state_str(self):
+    def state_str(self):
         return 'OK' if self.ok else 'ERROR'
 
     def _decrypt_password(self, encrypted_password):
@@ -87,7 +100,7 @@ class Monitor:
             self.status_code = None
             logging.error(f'Monitoring failed for {self.name}, {err}')
 
-    def as_dict(self, password=False):
+    def as_dict(self, password=False, date_as_str=True):
         dict_data = {
             'name': self.name,
             'enabled': self.enabled,
@@ -97,8 +110,8 @@ class Monitor:
             'username': self.username,
             'ok': self.ok,
             'status_code': self.status_code,
-            'last_check': str(self.last_check),
-            'created': str(self.created),
+            'last_check': str(self.last_check) if date_as_str else self.last_check,
+            'created': str(self.created) if date_as_str else self.created,
             'password': self.password
         }
         if not password:
@@ -106,7 +119,7 @@ class Monitor:
         return dict_data
 
     def __repr__(self):
-        return f'{self.name} {self._state_str}'
+        return f'{self.name} {self.state_str}'
 
     def __str__(self):
-        return f'{self.name} {self._state_str}'
+        return f'{self.name} {self.state_str}'
