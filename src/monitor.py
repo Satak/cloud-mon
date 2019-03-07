@@ -100,7 +100,7 @@ class Monitor:
             self.status_code = None
             logging.error(f'Monitoring failed for {self.name}, {err}')
 
-    def as_dict(self, password=False, date_as_str=True):
+    def as_dict(self, password=False):
         dict_data = {
             'name': self.name,
             'enabled': self.enabled,
@@ -110,8 +110,8 @@ class Monitor:
             'username': self.username,
             'ok': self.ok,
             'status_code': self.status_code,
-            'last_check': str(self.last_check) if date_as_str else self.last_check,
-            'created': str(self.created) if date_as_str else self.created,
+            'last_check': self.last_check,
+            'created': self.created,
             'password': self.password
         }
         if not password:

@@ -43,6 +43,8 @@ def api_add_monitor():
 
     json_data['password'] = encrypt(json_data['password'])
     json_data['created'] = datetime.utcnow()
+    json_data['last_check'] = None
+    json_data['ok'] = None
     data = add_data(json_data)
     return jsonify(data), data['status_code']
 
@@ -67,9 +69,19 @@ def api_edit_monitor(monitor_name):
 @app.route('/api/monitors/<string:monitor_name>')
 @basic_auth.required
 def api_get_monitors(monitor_name=None):
-    data = get_data(monitor_name=monitor_name)
-    status_code = 200 if data else 404
-    return jsonify(data), status_code
+    raw_data = get_data(monitor_name=monitor_name)
+    if not raw_data:
+        return jsonify({'error': 'No data'}), 404
+    # NOTE: This is ugly!
+    if isinstance(raw_data, list):
+        data = []
+        for item in raw_data:
+            del item['password']
+            data.append(item)
+    else:
+        del raw_data['password']
+        data = raw_data
+    return jsonify(data)
 
 
 @app.route('/api/monitors/<string:monitor_name>', methods=['DELETE'])

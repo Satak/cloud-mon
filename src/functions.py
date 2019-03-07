@@ -13,7 +13,7 @@ from conf import (
     TO_EMAIL
 )
 from monitor import Monitor
-from datastore import update_monitor_data, get_data
+from datastore import get_data, update_monitor_state
 
 
 def encrypt(data):
@@ -50,5 +50,5 @@ def monitor_all():
             subject = f'MONITOR {monitor.name} {monitor.state_str}'
             send_email(subject, body, TO_EMAIL)
             logging.info(body)
-        update_monitor_data(monitor.as_dict(password=True, date_as_str=False))
+        update_monitor_state(monitor.name, monitor.ok, monitor.last_check)
     return {'data': 'monitoring done'}

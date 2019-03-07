@@ -11,3 +11,4 @@ SMTP_PASSWORD = getenv('SMTP_PASSWORD')
 SMTP_SERVER = getenv('SMTP_SERVER')
 TO_EMAIL = getenv('TO_EMAIL')
 TIMEOUT = 20
+KIND = 'monitor'

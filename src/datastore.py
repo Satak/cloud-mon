@@ -1,23 +1,27 @@
 from datetime import datetime
 from google.cloud import datastore
-from conf import NAMESPACE
+from conf import NAMESPACE, KIND
 import logging
 
 client = datastore.Client(namespace=NAMESPACE)
 
 
-def update_monitor_data(data, kind='monitor'):
+def update_monitor_state(name, ok, last_check, kind=KIND):
     try:
+        record = get_data(monitor_name=name, kind=kind)
+        if not record:
+            err_msg = f'Record {name} not found while trying to update monitoring data'
+            logging.error(err_msg)
+            return {'error': err_msg, 'status_code': 404}
         with client.transaction():
-            item = datastore.Entity(key=client.key(kind, data['name']))
-            item.update(data)
-            client.put(item)
-        return {'data': dict(item), 'status_code': 200}
+            record['ok'] = ok
+            record['last_check'] = last_check
+            client.put(record)
     except Exception as err:
-        return {'error': str(err), 'status_code': 400}
+        logging.error(f'Error exception while trying to update monitorg data for {name}: {err}')
 
 
-def add_data(data, kind='monitor'):
+def add_data(data, kind=KIND):
     record = get_data(monitor_name=data['name'], kind=kind)
     if record:
         return {'error': f'Record {record["name"]} already exists', 'status_code': 400}
@@ -31,7 +35,7 @@ def add_data(data, kind='monitor'):
         return {'error': str(err), 'status_code': 400}
 
 
-def modify_data(data, kind='monitor'):
+def modify_data(data, kind=KIND):
     modify_fields = (
         'base_url',
         'monitor_path',
@@ -40,7 +44,7 @@ def modify_data(data, kind='monitor'):
         'password',
         'enabled'
     )
-    record = get_data(monitor_name=data['name'], kind=kind, as_dict=False)
+    record = get_data(monitor_name=data['name'], kind=kind)
     if not record:
         return {'error': f'Record {data["name"]} not found', 'status_code': 404}
     try:
@@ -59,17 +63,14 @@ def modify_data(data, kind='monitor'):
         return {'error': err_message, 'status_code': 400}
 
 
-def get_data(monitor_name=None, kind='monitor', as_dict=True):
+def get_data(monitor_name=None, kind=KIND):
     if monitor_name:
         key = client.key(kind, monitor_name)
-        item = client.get(key=key)
-        if item:
-            return dict(item) if as_dict else item
-        return None
-    return [dict(item) for item in client.query(kind=kind).fetch() if item]
+        return client.get(key=key)
+    return [item for item in client.query(kind=kind).fetch() if item]
 
 
-def delete_data(monitor_name, kind='monitor'):
+def delete_data(monitor_name, kind=KIND):
     try:
         item = client.key(kind, monitor_name)
         client.delete(item)

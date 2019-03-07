@@ -6,7 +6,7 @@
     <div class="row">
       <div class="input-field col s6">
         <i class="material-icons prefix">web</i>
-        <input id="name" type="text" class="validate" value="{{monitor.name}}">
+        <input id="name" {% if action == 'edit' %}disabled{% endif %} type="text" class="validate" value="{{monitor.name}}">
         <label for="name">Monitor Name</label>
       </div>
       <div class="input-field col s6">
