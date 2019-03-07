@@ -33,7 +33,7 @@
       <td>{{monitor.monitor_path}}</td>
       <td>{{monitor.username}}</td>
       <td>{{monitor.created}}</td>
-      <td>{{monitor.last_check}}</td>
+      <td>{{monitor.last_check.strftime('%Y-%m-%d %H:%m')}}</td>
       <td>
         {% if monitor.ok == True %}
         <i class="material-icons small green-text">check_circle</i>
