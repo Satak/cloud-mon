@@ -10,7 +10,7 @@
             <i class="material-icons small grey-text">check_circle</i>
             {% endif %}
             {{monitor.name}}
-            <span class="badge">{{monitor.last_check.strftime('%Y-%m-%d %H:%m')}}</span>
+            <span class="badge">{{monitor.last_check.strftime('%Y-%m-%d %H:%M')}}</span>
         </div>
         <div class="collapsible-body">
             {% include 'monitor_table.html' %}
