@@ -10,5 +10,4 @@ SMTP_USERNAME = getenv('SMTP_USERNAME')
 SMTP_PASSWORD = getenv('SMTP_PASSWORD')
 SMTP_SERVER = getenv('SMTP_SERVER')
 TO_EMAIL = getenv('TO_EMAIL')
-CONF_FILE = path.join(path.dirname(__file__), '../data/data.yaml')
 TIMEOUT = 20

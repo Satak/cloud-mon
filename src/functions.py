@@ -1,9 +1,8 @@
 import logging
+from datetime import datetime
 import smtplib
-import yaml
 import requests
 from conf import (
-    CONF_FILE,
     DECRYPTION_KEY,
     DECRYPTION_URL,
     TIMEOUT,
@@ -14,15 +13,7 @@ from conf import (
     TO_EMAIL
 )
 from monitor import Monitor
-from datetime import datetime
-from datastore import get_data
-from pprint import pprint
-from datastore import update_monitor_data
-
-
-def load_conf_file(file_name):
-    with open(file_name) as file:
-        return yaml.load(file)
+from datastore import update_monitor_data, get_data
 
 
 def encrypt(data):
@@ -49,8 +40,6 @@ def send_email(subject, body, to_email, smtp_port=587):
 
 
 def monitor_all():
-    # same last_check for all monitors
-    # now = datetime.utcnow
     data = get_data()
     monitors = [Monitor(**item, plain_pw=False) for item in data if item.get('enabled')]
     for monitor in monitors:

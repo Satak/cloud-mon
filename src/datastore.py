@@ -49,7 +49,7 @@ def modify_data(data, kind='monitor'):
                 value = record[prop]
                 data_value = data.get(prop)
                 if data_value is not None and prop in modify_fields and data_value != value:
-                    print(f'Changing value for {data["name"]} prop: {prop}')
+                    logging.info(f'Changing value for {data["name"]} prop: {prop}')
                     record[prop] = data_value
             client.put(record)
         return {'data': dict(record), 'status_code': 200}
