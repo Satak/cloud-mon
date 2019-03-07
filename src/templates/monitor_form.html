@@ -11,7 +11,7 @@
       </div>
       <div class="input-field col s6">
         <i class="material-icons prefix">domain</i>
-        <input placeholder="https://some-url" id="base_url" type="text" class="validate" value="{{monitor.base_url}}">
+        <input placeholder="https://url.com" id="base_url" type="text" class="validate" value="{{monitor.base_url}}">
         <label for="base_url">Base URL</label>
       </div>
     </div>
@@ -30,17 +30,17 @@
     <div class="row">
       <div class="input-field col s6">
         <i class="material-icons prefix">web</i>
-        <input placeholder="/api/v1/login" id="login_path" type="text" class="validate" value="{{monitor.login_path}}">
+        <input placeholder="/api/login" id="login_path" type="text" class="validate" value="{{monitor.login_path}}">
         <label for="login_path">Login Path</label>
       </div>
       <div class="input-field col s6">
         <i class="material-icons prefix">web</i>
-        <input placeholder="/api/v1/some-route" id="monitor_path" type="text" class="validate" value="{{monitor.monitor_path}}">
+        <input placeholder="/api/items" id="monitor_path" type="text" class="validate" value="{{monitor.monitor_path}}">
         <label for="monitor_path">Monitor Path</label>
       </div>
     </div>
     <div class="row">
-      <div class="input-field col s8">
+      <div class="input-field col s6">
         <div class="switch">
           <label>
             Disabled
@@ -50,25 +50,27 @@
           </label>
         </div>
       </div>
-      <div class="input-field col s2">
-        <button class="btn waves-effect waves-light blue" type="button" name="action" onclick="testMonitor()">Test
-          <i class="material-icons left">cloud</i>
+      <div class="input-field col s3">
+        <button class="btn waves-effect waves-light blue darken-2" type="button" name="action" onclick="testMonitor()">
+          Test
         </button>
         <i id="test_success" hidden class="material-icons green-text">check_circle</i>
         <i id="test_error" hidden class="material-icons red-text">error</i>
       </div>
-      <div class="input-field col s2">
+      <div class="input-field col s1 push-l2">
         {% if action == 'add' %}
-        <button class="btn waves-effect waves-light blue" type="button" name="action" onclick="addNewMonitor()">Submit
+        <button class="btn waves-effect waves-light blue" type="button" name="action" onclick="addNewMonitor()">
+          Submit
+        </button>
         {% else %}
-        <button class="btn waves-effect waves-light blue" type="button" name="action" onclick="modifyMonitor('{{monitor.name}}')">Submit
-          <i class="material-icons left">send</i>
+        <button class="btn waves-effect waves-light blue" type="button" name="action" onclick="modifyMonitor('{{monitor.name}}')">
+          Submit
         </button>
         {% endif %}
       </div>
 
     </div>
-    
+
   </form>
 
 </div>
