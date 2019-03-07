@@ -10,7 +10,8 @@ from conf import (
     SMTP_USERNAME,
     SMTP_PASSWORD,
     SMTP_SERVER,
-    TO_EMAIL
+    TO_EMAIL,
+    SEND_EMAIL
 )
 from monitor import Monitor
 from datastore import get_data, update_monitor_state
@@ -48,7 +49,8 @@ def monitor_all():
         if monitor.state_str != last_state:
             body = f'{monitor.name} monitor state changed from {last_state} -> {monitor.state_str}'
             subject = f'MONITOR {monitor.name} {monitor.state_str}'
-            send_email(subject, body, TO_EMAIL)
+            if SEND_EMAIL:
+                send_email(subject, body, TO_EMAIL)
             logging.info(body)
         update_monitor_state(monitor.name, monitor.ok, monitor.last_check)
     return {'data': 'monitoring done'}

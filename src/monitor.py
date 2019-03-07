@@ -10,10 +10,11 @@ class Monitor:
             name,
             enabled,
             base_url,
-            login_path,
-            monitor_path,
-            username,
-            password,
+            monitor_type,
+            login_path=None,
+            monitor_path=None,
+            username=None,
+            password=None,
             created=None,
             last_check=None,
             ok=None,
@@ -22,21 +23,23 @@ class Monitor:
         self.name = name
         self.enabled = enabled
         self.base_url = base_url
+        self.monitor_type = monitor_type
         self.login_path = login_path
         self.monitor_path = monitor_path
         self.username = username
         self.password = self._encrypt_password(password) if plain_pw else password
         self.last_check = datetime.utcnow()
         self.created = created if created else datetime.utcnow()
-        self.token = self._login()
+        self.token = None
         self.ok = ok
         self.status_code = status_code
 
     @property
     def _headers(self):
-        return {
-            'Authorization': f'Bearer {self.token}'
-        }
+        if self.monitor_type == 'tokenAuth':
+            return {
+                'Authorization': f'Bearer {self.token}'
+            }
 
     @property
     def _credentials(self):
@@ -47,7 +50,7 @@ class Monitor:
 
     @property
     def _monitor_url(self):
-        return self.base_url + self.monitor_path
+        return f'{self.base_url}{self.monitor_path}' if self.monitor_type == 'tokenAuth' else self.base_url
 
     @property
     def _login_url(self):
@@ -69,28 +72,31 @@ class Monitor:
             logging.error(f'Decryption failed for {self.name}, {err}')
 
     def _encrypt_password(self, plain_text_password):
-        data = {
-            'action': 'encrypt',
-            'key': DECRYPTION_KEY,
-            'data': plain_text_password
-        }
-        try:
-            return requests.post(DECRYPTION_URL, json=data, timeout=TIMEOUT).json()['data']
-        except Exception as err:
-            logging.error(f'Encryption failed for {self.name}, {err}')
+        if self.monitor_type in ('basicAuth', 'tokenAuth'):
+            data = {
+                'action': 'encrypt',
+                'key': DECRYPTION_KEY,
+                'data': plain_text_password
+            }
+            try:
+                return requests.post(DECRYPTION_URL, json=data, timeout=TIMEOUT).json()['data']
+            except Exception as err:
+                logging.error(f'Encryption failed for {self.name}, {err}')
 
     def _login(self):
         try:
-            return requests.post(self._login_url, json=self._credentials, timeout=TIMEOUT).json()['token']
+            self.token = requests.post(self._login_url, json=self._credentials, timeout=TIMEOUT).json()['token']
         except Exception as err:
             logging.error(f'Error {self.name} while trying to login: {err}')
 
     def monitor(self):
-        if not self.token:
-            logging.error(f'No token for {self.name}')
-            self.ok = False
-            self.status_code = None
-            return None
+        if self.monitor_type == 'tokenAuth':
+            self._login()
+            if not self.token:
+                logging.error(f'No token for {self.name}')
+                self.ok = False
+                self.status_code = None
+                return None
         try:
             r = requests.get(self._monitor_url, headers=self._headers, timeout=TIMEOUT)
             self.ok = r.ok

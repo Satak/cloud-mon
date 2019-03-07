@@ -2,11 +2,23 @@
 
 {% block content %}
 <div class="row">
+
   <form class="col s12">
     <div class="row">
       <div class="input-field col s6">
+        <select id="monitor_type" {% if action == 'edit' %}disabled{% endif %} onchange="monitorTypeSelect(this.value)">
+          <option value="tokenAuth" {% if monitor_type == 'tokenAuth' %}selected{% endif %}>Token Auth</option>
+          <option value="basicAuth" {% if monitor_type == 'basicAuth' %}selected{% endif %}>Basic Auth</option>
+          <option value="noAuth" {% if monitor_type == 'noAuth' %}selected{% endif %}>No Auth</option>
+        </select>
+        <label>Monitor Type</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s6">
         <i class="material-icons prefix">web</i>
-        <input id="name" {% if action == 'edit' %}disabled{% endif %} type="text" class="validate" value="{{monitor.name}}">
+        <input id="name" {% if action == 'edit' %}disabled{% endif %} type="text" class="validate"
+          value="{{monitor.name}}">
         <label for="name">Monitor Name</label>
       </div>
       <div class="input-field col s6">
@@ -15,30 +27,12 @@
         <label for="base_url">Base URL</label>
       </div>
     </div>
-    <div class="row">
-      <div class="input-field col s6">
-        <i class="material-icons prefix">account_circle</i>
-        <input id="username" type="text" class="validate" value="{{monitor.username}}">
-        <label for="username">Username</label>
-      </div>
-      <div class="input-field col s6">
-        <i class="material-icons prefix">lock</i>
-        <input id="password" type="password" class="validate" value="{{monitor.password}}">
-        <label for="password">Password</label>
-      </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s6">
-        <i class="material-icons prefix">web</i>
-        <input placeholder="/api/login" id="login_path" type="text" class="validate" value="{{monitor.login_path}}">
-        <label for="login_path">Login Path</label>
-      </div>
-      <div class="input-field col s6">
-        <i class="material-icons prefix">web</i>
-        <input placeholder="/api/items" id="monitor_path" type="text" class="validate" value="{{monitor.monitor_path}}">
-        <label for="monitor_path">Monitor Path</label>
-      </div>
-    </div>
+    {% if monitor.monitor_type in ('basicAuth', 'tokenAuth') or action == 'add' %}
+      {% include 'monitor_form_ba_part.html' %}
+    {% endif %}
+    {% if monitor.monitor_type == 'tokenAuth' or action == 'add' %}
+      {% include 'monitor_form_ta_part.html' %}
+    {% endif %}
     <div class="row">
       <div class="input-field col s6">
         <div class="switch">
@@ -63,7 +57,8 @@
           Submit
         </button>
         {% else %}
-        <button class="btn waves-effect waves-light blue" type="button" name="action" onclick="modifyMonitor('{{monitor.name}}')">
+        <button class="btn waves-effect waves-light blue" type="button" name="action"
+          onclick="modifyMonitor('{{monitor.name}}')">
           Submit
         </button>
         {% endif %}

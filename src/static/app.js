@@ -3,7 +3,23 @@ document.addEventListener('DOMContentLoaded', function() {
   let instances1 = M.Collapsible.init(elems1);
   let elems2 = document.querySelectorAll('.sidenav');
   let instances2 = M.Sidenav.init(elems2);
+  let elems3 = document.querySelectorAll('select');
+  let instances3 = M.FormSelect.init(elems3);
 });
+
+// lol
+function monitorTypeSelect(value) {
+  if (value === 'noAuth') {
+    document.getElementById('basicAuth').style.display = 'none'
+    document.getElementById('tokenAuth').style.display = 'none'
+  } else if (value === 'basicAuth') {
+    document.getElementById('basicAuth').style.display = 'block'
+    document.getElementById('tokenAuth').style.display = 'none'
+  } else if (value === 'tokenAuth') {
+    document.getElementById('basicAuth').style.display = 'block'
+    document.getElementById('tokenAuth').style.display = 'block'
+  }
+}
 
 async function API(body, url, method) {
   const requestParams = {
@@ -22,15 +38,31 @@ async function API(body, url, method) {
 }
 
 function getNewMonitorFormData() {
-  return {
+  let body = {
+    monitor_type: document.getElementById("monitor_type").value,
     name: document.getElementById("name").value,
     enabled: document.getElementById("monitorEnabled").checked,
     base_url: document.getElementById("base_url").value,
-    login_path: document.getElementById("login_path").value,
-    monitor_path: document.getElementById("monitor_path").value,
-    username: document.getElementById("username").value,
-    password: document.getElementById("password").value
   }
+    const loginPathElement = document.getElementById("login_path")
+    const monitorPathElement = document.getElementById("monitor_path")
+    const usernameElement = document.getElementById("username")
+    const passwordElement = document.getElementById("password")
+    // lol
+    if (loginPathElement) {
+      body['login_path'] = loginPathElement.value
+    }
+    if (monitorPathElement) {
+      body['monitor_path'] = monitorPathElement.value
+    }
+    if (usernameElement) {
+      body['username'] = usernameElement.value
+    }
+    if (passwordElement) {
+      body['password'] = passwordElement.value
+    }
+
+  return parseBody(body)
 }
 
 function testMonitor() {
@@ -51,6 +83,19 @@ function testMonitor() {
       testSuccessIcon.setAttribute("hidden", true)
     }
   }).catch(alert)
+}
+
+function parseBody(body) {
+  if (body['monitor_type'] === 'noAuth') {
+    delete body['username']
+    delete body['password']
+    delete body['login_path']
+    delete body['monitor_path']
+  } else if (body['monitor_type'] === 'basicAuth') {
+    delete body['login_path']
+    delete body['monitor_path']
+  }
+  return body
 }
 
 function addNewMonitor() {

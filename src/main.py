@@ -2,11 +2,21 @@ import logging
 from flask import Flask, request, jsonify, render_template, abort
 from flask_basicauth import BasicAuth
 from monitor import Monitor
-from validators import validate_monitor
+from validators import token_auth_validate, basic_auth_validate, no_auth_validate
 from datastore import add_data, get_data, delete_data, modify_data
 from functions import encrypt, monitor_all
 from datetime import datetime
-from conf import BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD
+from conf import (
+    BASIC_AUTH_USERNAME,
+    BASIC_AUTH_PASSWORD,
+    SEND_EMAIL,
+    TIMEOUT,
+    SENDER_EMAIL,
+    SMTP_SERVER,
+    TO_EMAIL,
+    SENDER_EMAIL,
+    NAMESPACE
+)
 
 app = Flask(__name__)
 
@@ -17,15 +27,28 @@ basic_auth = BasicAuth(app)
 logging.getLogger().setLevel(logging.INFO)
 
 
+def validate_payload(payload):
+    monitor_type = payload['monitor_type']
+    validate_map = {
+        'noAuth': lambda data: no_auth_validate(data),
+        'basicAuth': lambda data: basic_auth_validate(data),
+        'tokenAuth': lambda data: token_auth_validate(data)
+    }
+    try:
+        return validate_map[monitor_type](payload)
+    except Exception as err:
+        logging.error(str(err))
+        return {'error': str(err)}
+
+
 # API
 @app.route('/api/test', methods=['POST'])
 @basic_auth.required
 def api_test():
-    try:
-        json_data = validate_monitor(request.get_json(silent=True))
-    except Exception as err:
-        logging.error(str(err))
-        return jsonify({'error': str(err)}), 400
+    payload = request.get_json(silent=True)
+    json_data = validate_payload(payload)
+    if json_data.get('error'):
+        return jsonify(json_data), 400
 
     monitor = Monitor(**json_data)
     monitor.monitor()
@@ -35,13 +58,13 @@ def api_test():
 @app.route('/api/monitors', methods=['POST'])
 @basic_auth.required
 def api_add_monitor():
-    try:
-        json_data = validate_monitor(request.get_json(silent=True))
-    except Exception as err:
-        logging.error(str(err))
-        return jsonify({'error': str(err)}), 400
+    payload = request.get_json(silent=True)
+    json_data = validate_payload(payload)
+    if json_data.get('error'):
+        return jsonify(json_data), 400
 
-    json_data['password'] = encrypt(json_data['password'])
+    if json_data.get('password'):
+        json_data['password'] = encrypt(json_data['password'])
     json_data['created'] = datetime.utcnow()
     json_data['last_check'] = None
     json_data['ok'] = None
@@ -52,15 +75,17 @@ def api_add_monitor():
 @app.route('/api/monitors/<string:monitor_name>', methods=['PUT'])
 @basic_auth.required
 def api_edit_monitor(monitor_name):
-    try:
-        json_data = validate_monitor(request.get_json(silent=True))
-    except Exception as err:
-        logging.error(str(err))
-        return jsonify({'error': str(err)}), 400
+    payload = request.get_json(silent=True)
+    json_data = validate_payload(payload)
+    if json_data.get('error'):
+        return jsonify(json_data), 400
 
-    password = json_data['password']
-    password = encrypt(password) if password else None
-    json_data['password'] = password
+    password = json_data.get('password')
+    monitor_type = json_data.get('monitor_type')
+    if monitor_type in ('basicAuth', 'tokenAuth') and password:
+        # modify_data will skip all None values!
+        password = encrypt(password) if password else None
+        json_data['password'] = password
     data = modify_data(json_data)
     return jsonify(data), data['status_code']
 
@@ -135,8 +160,23 @@ def view_add_monitor():
 @basic_auth.required
 def view_modify_monitor(monitor_name):
     monitor = get_data(monitor_name=monitor_name)
-    del monitor['password']
+    if 'password' in monitor:
+        del monitor['password']
     return render_template('monitor_form.html', monitor=monitor, action='edit')
+
+
+@app.route('/settings')
+@basic_auth.required
+def view_settings():
+    settings = {
+        'namespace': NAMESPACE,
+        'sender_email': SENDER_EMAIL,
+        'smtp_server': SMTP_SERVER,
+        'to_email': TO_EMAIL,
+        'timeout': TIMEOUT,
+        'send_email': SEND_EMAIL
+    }
+    return render_template('settings.html', settings=settings)
 
 
 if __name__ == '__main__':
