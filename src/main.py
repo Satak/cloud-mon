@@ -79,27 +79,21 @@ def api_delete_monitor(monitor_name):
     return jsonify(data), data['status_code']
 
 
-@app.route('/api/invoke-monitor', methods=['PUT'])
-@basic_auth.required
+@app.route('/api/invoke-monitor')
 def api_invoke_monitor():
-    data = monitor_all()
-    return jsonify(data)
-
-
-@app.route('/api/cron')
-def api_cron():
     from_app_engine = request.headers.get('X-Appengine-Cron')
     client_ip = request.remote_addr
-    if not from_app_engine or client_ip != '10.0.0.1':
+    if not from_app_engine or client_ip != '127.0.0.1':
         logging.error(f'Invalid cron attempt! IP: {client_ip}')
         return abort(401)
-    ok_msg = 'OK cron job'
-    logging.info(ok_msg)
-    return jsonify({'data': ok_msg})
+    data = monitor_all()
+    logging.info('Monitoring done')
+    return jsonify(data)
 
 
 @app.route('/api/status')
 def api_status():
+    logging.info('Status check')
     return jsonify({'status': 'OK'})
 
 

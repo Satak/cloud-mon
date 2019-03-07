@@ -1,0 +1,4 @@
+cron:
+- description: "Invoke monitoring"
+  url: /api/invoke-monitor
+  schedule: every 15 mins
