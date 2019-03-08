@@ -11,6 +11,7 @@
             {% endif %}
             {{monitor.name}}
             {% if monitor.last_check %}
+            <span class="badge">{{monitor.response_time}} ms</span>
             <span class="badge">{{monitor.last_check.strftime('%Y-%m-%d %H:%M')}}</span>
             {% endif %}
         </div>

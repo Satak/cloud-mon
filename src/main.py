@@ -101,10 +101,12 @@ def api_get_monitors(monitor_name=None):
     if isinstance(raw_data, list):
         data = []
         for item in raw_data:
-            del item['password']
+            if 'password' in item:
+                del item['password']
             data.append(item)
     else:
-        del raw_data['password']
+        if 'password' in raw_data:
+            del raw_data['password']
         data = raw_data
     return jsonify(data)
 

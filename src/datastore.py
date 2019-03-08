@@ -6,7 +6,7 @@ import logging
 client = datastore.Client(namespace=NAMESPACE)
 
 
-def update_monitor_state(name, ok, last_check, kind=KIND):
+def update_monitor_state(name, ok, last_check, response_time=None, kind=KIND):
     try:
         record = get_data(monitor_name=name, kind=kind)
         if not record:
@@ -16,6 +16,7 @@ def update_monitor_state(name, ok, last_check, kind=KIND):
         with client.transaction():
             record['ok'] = ok
             record['last_check'] = last_check
+            record['response_time'] = response_time
             client.put(record)
     except Exception as err:
         logging.error(f'Error exception while trying to update monitorg data for {name}: {err}')

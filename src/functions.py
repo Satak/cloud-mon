@@ -52,5 +52,5 @@ def monitor_all():
             if SEND_EMAIL:
                 send_email(subject, body, TO_EMAIL)
             logging.info(body)
-        update_monitor_state(monitor.name, monitor.ok, monitor.last_check)
+        update_monitor_state(monitor.name, monitor.ok, monitor.last_check, monitor.response_time)
     return {'data': 'monitoring done'}

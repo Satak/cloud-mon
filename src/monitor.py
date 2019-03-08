@@ -28,11 +28,12 @@ class Monitor:
         self.monitor_path = monitor_path
         self.username = username
         self.password = self._encrypt_password(password) if plain_pw else password
-        self.last_check = datetime.utcnow()
+        self.last_check = None
         self.created = created if created else datetime.utcnow()
         self.token = None
         self.ok = ok
         self.status_code = status_code
+        self.response_time = None
 
     @property
     def _headers(self):
@@ -90,6 +91,8 @@ class Monitor:
             logging.error(f'Error {self.name} while trying to login: {err}')
 
     def monitor(self):
+        monitor_datetime = datetime.utcnow()
+        self.last_check = monitor_datetime
         if self.monitor_type == 'tokenAuth':
             self._login()
             if not self.token:
@@ -99,6 +102,7 @@ class Monitor:
                 return None
         try:
             r = requests.get(self._monitor_url, headers=self._headers, timeout=TIMEOUT)
+            self.response_time = int(1000 * (r.elapsed.total_seconds()))
             self.ok = r.ok
             self.status_code = r.status_code
         except Exception as err:
@@ -118,7 +122,8 @@ class Monitor:
             'status_code': self.status_code,
             'last_check': self.last_check,
             'created': self.created,
-            'password': self.password
+            'password': self.password,
+            'response_time': self.response_time
         }
         if not password:
             del dict_data['password']
