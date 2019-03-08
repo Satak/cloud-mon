@@ -3,52 +3,48 @@
 {% block content %}
 <h4>Environment settings</h4>
 <p>This is just a read only view for the main settings.
-You can change these settings from the application environment variables.</p>
+    You can change these settings from the application environment variables.</p>
 <br>
 <form class="col s12">
     <div class="row">
-        <div class="input-field col s3">
+        <div class="input-field col s12">
             <i class="material-icons prefix">business</i>
-            <input disabled type="text" id="namespace"
-                value="{{settings.namespace}}">
+            <input disabled type="text" id="namespace" value="{{settings.namespace}}">
             <label for="namespace">namespace</label>
         </div>
-        <div class="input-field col s3">
+    </div>
+    <div class="row">
+        <div class="input-field col s6">
             <i class="material-icons prefix">access_time</i>
-            <input disabled type="text" id="timeout"
-                value="{{settings.timeout}}">
+            <input disabled type="text" id="timeout" value="{{settings.timeout}}">
             <label for="timeout">timeout</label>
         </div>
-        <div class="input-field col s3">
+        <div class="input-field col s6">
             <i class="material-icons prefix">email</i>
-            <input disabled type="text" id="send_email"
-                value="{{settings.send_email}}">
+            <input disabled type="text" id="send_email" value="{{settings.send_email}}">
             <label for="send_email">send_email</label>
         </div>
     </div>
     <div class="row">
         <div class="input-field col s12">
             <i class="material-icons prefix">computer</i>
-            <input disabled type="text" id="smtp_server"
-                value="{{settings.smtp_server}}">
+            <input disabled type="text" id="smtp_server" value="{{settings.smtp_server}}">
             <label for="smtp_server">smtp_server</label>
         </div>
-        </div>
-        <div class="row">
+    </div>
+    <div class="row">
         <div class="input-field col s12">
             <i class="material-icons prefix">email</i>
-            <input disabled type="text" id="sender_email"
-                value="{{settings.sender_email}}">
+            <input disabled type="text" id="sender_email" value="{{settings.sender_email}}">
             <label for="sender_email">sender_email</label>
         </div>
+    </div>
+    <div class="row">
+        <div class="input-field col s12">
+            <i class="material-icons prefix">email</i>
+            <input disabled type="text" id="to_email" value="{{settings.to_email}}">
+            <label for="to_email">to_email</label>
         </div>
-        <div class="row">
-            <div class="input-field col s12">
-                <i class="material-icons prefix">email</i>
-                <input disabled type="text" id="to_email"
-                    value="{{settings.to_email}}">
-                <label for="to_email">to_email</label>
-            </div>
-        </div>
+    </div>
 </form>
 {% endblock %}

@@ -12,4 +12,4 @@ SMTP_SERVER = getenv('SMTP_SERVER')
 TO_EMAIL = getenv('TO_EMAIL')
 TIMEOUT = 20
 KIND = 'monitor'
-SEND_EMAIL = False
+SEND_EMAIL = True
