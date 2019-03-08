@@ -19,6 +19,7 @@ class Monitor:
             last_check=None,
             ok=None,
             status_code=None,
+            response_time=None,
             plain_pw=True):
         self.name = name
         self.enabled = enabled
