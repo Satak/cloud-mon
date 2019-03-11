@@ -7,9 +7,9 @@
     <div class="row">
       <div class="input-field col s6">
         <select id="monitor_type" {% if action == 'edit' %}disabled{% endif %} onchange="monitorTypeSelect(this.value)">
-          <option value="tokenAuth" {% if monitor_type == 'tokenAuth' %}selected{% endif %}>Token Auth</option>
-          <option value="basicAuth" {% if monitor_type == 'basicAuth' %}selected{% endif %}>Basic Auth</option>
-          <option value="noAuth" {% if monitor_type == 'noAuth' %}selected{% endif %}>No Auth</option>
+          <option value="tokenAuth" {% if monitor.monitor_type == 'tokenAuth' %}selected{% endif %}>Token Auth</option>
+          <option value="basicAuth" {% if monitor.monitor_type == 'basicAuth' %}selected{% endif %}>Basic Auth</option>
+          <option value="noAuth" {% if monitor.monitor_type == 'noAuth' %}selected{% endif %}>No Auth</option>
         </select>
         <label>Monitor Type</label>
       </div>

@@ -7,17 +7,30 @@ client = datastore.Client(namespace=NAMESPACE)
 
 
 def update_monitor_state(name, ok, last_check, response_time=None, kind=KIND):
+    monitoring_data = {
+        'ok': ok,
+        'timestamp': last_check,
+        'response_time': response_time,
+        'parent_name': name
+    }
     try:
-        record = get_data(monitor_name=name, kind=kind)
+        parent_key = client.key(kind, name)
+        record = client.get(key=parent_key)
         if not record:
             err_msg = f'Record {name} not found while trying to update monitoring data'
             logging.error(err_msg)
             return {'error': err_msg, 'status_code': 404}
         with client.transaction():
+            # store main data
             record['ok'] = ok
             record['last_check'] = last_check
             record['response_time'] = response_time
             client.put(record)
+            # store monitoring data entity
+            key = client.key('data', parent=parent_key)
+            data_entity = datastore.Entity(key=key)
+            data_entity.update(monitoring_data)
+            client.put(data_entity)
     except Exception as err:
         logging.error(f'Error exception while trying to update monitorg data for {name}: {err}')
 
@@ -78,3 +91,9 @@ def delete_data(monitor_name, kind=KIND):
         return {'data': {}, 'status_code': 204}
     except Exception as err:
         return {'error': str(err), 'status_code': 400}
+
+
+def get_monitoring_data(monitor_name, kind=KIND):
+    ancestor = client.key(kind, monitor_name)
+    query = client.query(kind='data', ancestor=ancestor)
+    return [item for item in query.fetch()]

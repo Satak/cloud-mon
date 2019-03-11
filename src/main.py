@@ -3,7 +3,13 @@ from flask import Flask, request, jsonify, render_template, abort
 from flask_basicauth import BasicAuth
 from monitor import Monitor
 from validators import token_auth_validate, basic_auth_validate, no_auth_validate
-from datastore import add_data, get_data, delete_data, modify_data
+from datastore import (
+    add_data,
+    get_data,
+    delete_data,
+    modify_data,
+    get_monitoring_data
+)
 from functions import encrypt, monitor_all
 from datetime import datetime
 from conf import (
@@ -109,6 +115,12 @@ def api_get_monitors(monitor_name=None):
             del raw_data['password']
         data = raw_data
     return jsonify(data)
+
+
+@app.route('/api/monitor-data/<string:monitor_name>')
+@basic_auth.required
+def api_get_monitor_data(monitor_name):
+    return jsonify(get_monitoring_data(monitor_name))
 
 
 @app.route('/api/monitors/<string:monitor_name>', methods=['DELETE'])
