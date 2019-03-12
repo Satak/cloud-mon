@@ -96,4 +96,5 @@ def delete_data(monitor_name, kind=KIND):
 def get_monitoring_data(monitor_name, kind=KIND):
     ancestor = client.key(kind, monitor_name)
     query = client.query(kind='data', ancestor=ancestor)
+    query.order = ['timestamp']
     return [item for item in query.fetch()]

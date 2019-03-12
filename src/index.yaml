@@ -1,0 +1,5 @@
+indexes:
+- kind: data
+  ancestor: yes
+  properties:
+  - name: timestamp

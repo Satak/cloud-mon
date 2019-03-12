@@ -1,23 +1,23 @@
 <ul class="collapsible">
-    {% for monitor in monitors %}
-    <li>
-        <div class="collapsible-header">
-            {% if monitor.ok == True %}
-            <i class="material-icons small green-text">check_circle</i>
-            {% elif monitor.ok == False %}
-            <i class="material-icons small red-text">error</i>
-            {% else %}
-            <i class="material-icons small grey-text">check_circle</i>
-            {% endif %}
-            {{monitor.name}}
-            {% if monitor.last_check %}
-            <span class="badge">{{monitor.response_time}} ms</span>
-            <span class="badge">{{monitor.last_check.strftime('%Y-%m-%d %H:%M')}}</span>
-            {% endif %}
-        </div>
-        <div class="collapsible-body">
-            {% include 'monitor_table.html' %}
-        </div>
-    </li>
-    {% endfor %}
+  {% for monitor in monitors %}
+  <li>
+    <div class="collapsible-header" onclick="drawLinechart('{{monitor.name}}')">
+      {% if monitor.ok == True %}
+      <i class="material-icons small green-text">check_circle</i>
+      {% elif monitor.ok == False %}
+      <i class="material-icons small red-text">error</i>
+      {% else %}
+      <i class="material-icons small grey-text">check_circle</i>
+      {% endif %}
+      {{monitor.name}}
+      {% if monitor.last_check %}
+      <span class="badge">{{monitor.response_time}} ms</span>
+      <span class="badge">{{monitor.last_check.strftime('%Y-%m-%d %H:%M')}}</span>
+      {% endif %}
+    </div>
+    <div class="collapsible-body">
+      {% include 'monitor_table.html' %}
+    </div>
+  </li>
+  {% endfor %}
 </ul>

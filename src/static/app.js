@@ -5,9 +5,14 @@ document.addEventListener('DOMContentLoaded', function() {
   let instances2 = M.Sidenav.init(elems2);
   let elems3 = document.querySelectorAll('select');
   let instances3 = M.FormSelect.init(elems3);
-});
+})
 
-// lol
+google.charts.load('current', {packages: ['corechart', 'line']})
+function drawLinechart(name) {
+  google.charts.setOnLoadCallback(() => drawBasic(name))
+}
+
+// TODO: clean this up or start using Vue
 function monitorTypeSelect(value) {
   if (value === 'noAuth') {
     document.getElementById('basicAuth').style.display = 'none'
@@ -27,8 +32,10 @@ async function API(body, url, method) {
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
+    }
+  }
+  if(body) {
+    requestParams['body'] = JSON.stringify(body)
   }
 
   const response = await fetch(url, requestParams)
@@ -136,4 +143,29 @@ function invokeMonitor() {
   const url = '/api/ui-invoke-monitor'
   const body = {}
   API(body, url, method).then(_ => redirectToIndex()).catch(alert)
+}
+
+function drawBasic(name) {
+  const url = `/api/monitor-data/${name}`
+  const data = new google.visualization.DataTable()
+  const options = {
+    hAxis: {
+      title: 'Datetime'
+    },
+    vAxis: {
+      title: 'Milliseconds'
+    }
+  }
+  const chart = new google.visualization.LineChart(document.getElementById('chart_div'))
+  data.addColumn('datetime', 'Datetime')
+  data.addColumn('number', 'Response Time')
+  API(null, url, 'get').then(res => {
+    let dataArray = []
+    res.forEach(element => {
+      let timestamp = new Date(element.timestamp);
+      dataArray.push([timestamp, element.response_time])
+    })
+    data.addRows(dataArray)
+    chart.draw(data, options)
+  }).catch(alert)
 }
