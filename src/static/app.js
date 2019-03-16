@@ -109,14 +109,14 @@ function addNewMonitor() {
   const method = 'POST'
   const url = '/api/monitors'
   const body = getNewMonitorFormData()
-  API(body, url, method).then(_ => redirectToIndex()).catch(alert)
+  API(body, url, method).then(_ => redirectToHome()).catch(alert)
 }
 
 function modifyMonitor(name) {
   const method = 'PUT'
   const url = `/api/monitors/${name}`
   const body = getNewMonitorFormData()
-  API(body, url, method).then(_ => redirectToIndex()).catch(alert)
+  API(body, url, method).then(_ => redirectToHome()).catch(alert)
 }
 
 async function deleteMonitor(monitorName) {
@@ -134,6 +134,10 @@ async function deleteMonitor(monitorName) {
   }
 }
 
+function redirectToHome() {
+  document.location = '/home'
+}
+
 function redirectToIndex() {
   document.location = '/'
 }
@@ -142,7 +146,7 @@ function invokeMonitor() {
   const method = 'PUT'
   const url = '/api/ui-invoke-monitor'
   const body = {}
-  API(body, url, method).then(_ => redirectToIndex()).catch(alert)
+  API(body, url, method).then(_ => redirectToHome()).catch(alert)
 }
 
 function drawBasic(name) {
@@ -168,4 +172,44 @@ function drawBasic(name) {
     data.addRows(dataArray)
     chart.draw(data, options)
   }).catch(alert)
+}
+
+function auth_login() {
+  const email = document.getElementById("auth_email").value
+  const password = document.getElementById("auth_password").value
+  const method = 'POST'
+  const url = '/api/login'
+  const body = {
+    email: email,
+    password: password
+  }
+  API(body, url, method).then(_ => redirectToHome()).catch(alert)
+}
+
+function auth_logout() {
+  const method = 'POST'
+  const url = '/api/logout'
+  API(null, url, method).then(_ => redirectToIndex()).catch(alert)
+}
+
+function change_password() {
+  const currentPassword = document.getElementById("auth_current_password").value
+  const newPassword = document.getElementById("auth_new_password").value
+  const verifyPassword = document.getElementById("auth_verify_password").value
+  if(!currentPassword || !newPassword || !verifyPassword) {
+    alert('Please fill all fields!')
+    return null
+  }
+  if(newPassword != verifyPassword) {
+    alert('New password and verify password doesn\'t match!')
+    return null
+  }
+  const method = 'POST'
+  const body = {
+    currentPassword: currentPassword,
+    newPassword: newPassword,
+    verifyPassword: verifyPassword
+  }
+  const url = '/api/change-password'
+  API(body, url, method).then(_ => redirectToHome()).catch(alert)
 }

@@ -1,6 +1,18 @@
 import logging
-from flask import Flask, request, jsonify, render_template, abort
-from flask_basicauth import BasicAuth
+from functools import wraps
+import pyrebase
+import firebase_admin
+from firebase_admin import credentials, auth as admin_auth
+from flask import (
+    Flask,
+    request,
+    jsonify,
+    render_template,
+    abort,
+    redirect,
+    session,
+    url_for
+)
 from monitor import Monitor
 from validators import token_auth_validate, basic_auth_validate, no_auth_validate
 from datastore import (
@@ -13,24 +25,36 @@ from datastore import (
 from functions import encrypt, monitor_all
 from datetime import datetime
 from conf import (
-    BASIC_AUTH_USERNAME,
-    BASIC_AUTH_PASSWORD,
     SEND_EMAIL,
     TIMEOUT,
     SENDER_EMAIL,
     SMTP_SERVER,
     TO_EMAIL,
     SENDER_EMAIL,
-    NAMESPACE
+    NAMESPACE,
+    SECRET,
+    FIREBASE_CONFIG,
+    FIREBASE_ADMIN_SDK_KEY
 )
 
 app = Flask(__name__)
 
-app.config['BASIC_AUTH_USERNAME'] = BASIC_AUTH_USERNAME
-app.config['BASIC_AUTH_PASSWORD'] = BASIC_AUTH_PASSWORD
+app.secret_key = SECRET
+firebase = pyrebase.initialize_app(FIREBASE_CONFIG)
+auth = firebase.auth()
+firebase_admin_cred = credentials.Certificate(FIREBASE_ADMIN_SDK_KEY)
+firebase_admin.initialize_app(firebase_admin_cred)
 
-basic_auth = BasicAuth(app)
 logging.getLogger().setLevel(logging.INFO)
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('user'):
+            return redirect(url_for('view_login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 def validate_payload(payload):
@@ -47,9 +71,36 @@ def validate_payload(payload):
         return {'error': str(err)}
 
 
+def change_password(email, uid, current_password, new_password):
+    try:
+        # validate current password
+        _ = auth.sign_in_with_email_and_password(email, current_password)
+        admin_auth.update_user(uid, password=new_password)
+        return True
+    except Exception as err:
+        print('Invalid credentials', str(err))
+
+
+def login(email, password):
+    try:
+        user = auth.sign_in_with_email_and_password(email, password)
+        user_info = auth.get_account_info(user['idToken'])
+        if user_info:
+            email_ = user_info['users'][0]['email']
+            uid = user_info['users'][0]['localId']
+            user = {
+                'email': email_,
+                'uid': uid
+            }
+            session['user'] = user
+            return user
+    except Exception as err:
+        print('Invalid credentials', str(err))
+
+
 # API
 @app.route('/api/test', methods=['POST'])
-@basic_auth.required
+@login_required
 def api_test():
     payload = request.get_json(silent=True)
     json_data = validate_payload(payload)
@@ -62,7 +113,7 @@ def api_test():
 
 
 @app.route('/api/monitors', methods=['POST'])
-@basic_auth.required
+@login_required
 def api_add_monitor():
     payload = request.get_json(silent=True)
     json_data = validate_payload(payload)
@@ -79,7 +130,7 @@ def api_add_monitor():
 
 
 @app.route('/api/monitors/<string:monitor_name>', methods=['PUT'])
-@basic_auth.required
+@login_required
 def api_edit_monitor(monitor_name):
     payload = request.get_json(silent=True)
     json_data = validate_payload(payload)
@@ -98,7 +149,7 @@ def api_edit_monitor(monitor_name):
 
 @app.route('/api/monitors')
 @app.route('/api/monitors/<string:monitor_name>')
-@basic_auth.required
+@login_required
 def api_get_monitors(monitor_name=None):
     raw_data = get_data(monitor_name=monitor_name)
     if not raw_data:
@@ -118,13 +169,13 @@ def api_get_monitors(monitor_name=None):
 
 
 @app.route('/api/monitor-data/<string:monitor_name>')
-@basic_auth.required
+@login_required
 def api_get_monitor_data(monitor_name):
     return jsonify(get_monitoring_data(monitor_name))
 
 
 @app.route('/api/monitors/<string:monitor_name>', methods=['DELETE'])
-@basic_auth.required
+@login_required
 def api_delete_monitor(monitor_name):
     data = delete_data(monitor_name)
     return jsonify(data), data['status_code']
@@ -143,7 +194,7 @@ def api_invoke_monitor():
 
 
 @app.route('/api/ui-invoke-monitor', methods=['PUT'])
-@basic_auth.required
+@login_required
 def api_ui_invoke_monitor():
     data = monitor_all()
     logging.info('Monitoring done launched from UI')
@@ -151,27 +202,75 @@ def api_ui_invoke_monitor():
 
 
 @app.route('/api/status')
+@login_required
 def api_status():
     logging.info('Status check')
     return jsonify({'status': 'OK'})
 
 
+@app.route('/api/change-password', methods=['POST'])
+def api_change_password():
+    payload = request.get_json(silent=True)
+    current_password = payload['currentPassword']
+    new_password = payload['newPassword']
+    email = session.get('user')['email']
+    uid = session.get('user')['uid']
+
+    res = change_password(email, uid, current_password, new_password)
+    if not res:
+        return jsonify({'error': 'Password change failed'}), 401
+    return jsonify({'message': 'Password changed successfully'})
+
+
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    payload = request.get_json(silent=True)
+    email = payload['email']
+    password = payload['password']
+    user = login(email, password)
+    if not user:
+        return jsonify({'error': 'Invalid login'}), 401
+    return jsonify({'message': 'Login success'})
+
+
+@app.route('/api/logout', methods=['POST'])
+@login_required
+def api_logout():
+    if not session.get('user'):
+        return jsonify({'error': 'Not logged in'}), 401
+    del session['user']
+    return jsonify({'message': 'Logout success'})
+
+
 # Views
 @app.route('/')
-@basic_auth.required
-def view_index():
+def view_login():
+    if session.get('user'):
+        return redirect(url_for('view_home'))
+    return render_template('login.html')
+
+
+@app.route('/home')
+@login_required
+def view_home():
     data = get_data()
-    return render_template('index.html', monitors=data)
+    return render_template('home.html', monitors=data)
 
 
 @app.route('/add-monitor')
-@basic_auth.required
+@login_required
 def view_add_monitor():
     return render_template('monitor_form.html', monitor=None, action='add')
 
 
+@app.route('/account')
+@login_required
+def view_account():
+    return render_template('account.html', email=session.get('user')['email'])
+
+
 @app.route('/monitors/<string:monitor_name>')
-@basic_auth.required
+@login_required
 def view_modify_monitor(monitor_name):
     monitor = get_data(monitor_name=monitor_name)
     if 'password' in monitor:
@@ -180,7 +279,7 @@ def view_modify_monitor(monitor_name):
 
 
 @app.route('/settings')
-@basic_auth.required
+@login_required
 def view_settings():
     settings = {
         'namespace': NAMESPACE,

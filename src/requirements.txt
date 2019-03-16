@@ -1,5 +1,6 @@
 flask
-Flask-BasicAuth
 requests
 fastjsonschema
 google-cloud-datastore
+pyrebase
+firebase-admin
