@@ -34,7 +34,8 @@ from conf import (
     NAMESPACE,
     SECRET,
     FIREBASE_CONFIG,
-    FIREBASE_ADMIN_SDK_KEY
+    FIREBASE_ADMIN_SDK_KEY,
+    PRODUCTION
 )
 
 app = Flask(__name__)
@@ -42,10 +43,17 @@ app = Flask(__name__)
 app.secret_key = SECRET
 firebase = pyrebase.initialize_app(FIREBASE_CONFIG)
 auth = firebase.auth()
-firebase_admin_cred = credentials.Certificate(FIREBASE_ADMIN_SDK_KEY)
-firebase_admin.initialize_app(firebase_admin_cred)
-
 logging.getLogger().setLevel(logging.INFO)
+
+try:
+    if PRODUCTION:
+        firebase_admin.initialize_app()
+    else:
+        firebase_admin_cred = credentials.Certificate(FIREBASE_ADMIN_SDK_KEY)
+        firebase_admin.initialize_app(firebase_admin_cred)
+except Exception as err:
+    logging.info(f'Starting app in prod: {PRODUCTION}')
+    logging.error(f'ERROR at firebase_admin.initialize_app: {err}')
 
 
 def login_required(f):
