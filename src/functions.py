@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 import smtplib
+from email.message import EmailMessage
 import requests
 from conf import (
     DECRYPTION_KEY,
@@ -29,15 +30,19 @@ def encrypt(data):
         logging.error(f'Encryption failed: {err}')
 
 
-def send_email(subject, body, to_email, smtp_port=587):
-    with smtplib.SMTP(SMTP_SERVER, smtp_port) as smtp:
-        smtp.ehlo()
-        smtp.starttls()
-        smtp.ehlo()
-        smtp.login(SMTP_USERNAME, SMTP_PASSWORD)
-        msg = f'Subject: {subject}\n\n{body}'
-        smtp.sendmail(SENDER_EMAIL, to_email, msg)
-        logging.info(f'Email sent to {to_email}')
+def send_email(subject, message, sender, recipients, smtp_server, smtp_username, smtp_password, smtp_port=465):
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = recipients
+    msg.set_content(message)
+    try:
+        with smtplib.SMTP_SSL(smtp_server, smtp_port) as smtp:
+            smtp.login(smtp_username, smtp_password)
+            smtp.send_message(msg)
+            logging.info(f'Email sent to {recipients}')
+    except Exception as err:
+        logging.error(f'Error while trying to send email to {recipients}, error: {err}')
 
 
 def monitor_all():
@@ -47,10 +52,19 @@ def monitor_all():
         last_state = monitor.state_str
         monitor.monitor()
         if monitor.state_str != last_state:
-            body = f'{monitor.name} monitor state changed from {last_state} -> {monitor.state_str}'
+            message = f'{monitor.name} monitor state changed from {last_state} -> {monitor.state_str}'
             subject = f'MONITOR {monitor.name} {monitor.state_str}'
             if SEND_EMAIL:
-                send_email(subject, body, TO_EMAIL)
-            logging.info(body)
+                email_conf = {
+                    'subject': subject,
+                    'message': message,
+                    'sender': SENDER_EMAIL,
+                    'recipients': TO_EMAIL.split(','),
+                    'smtp_server': SMTP_SERVER,
+                    'smtp_username': SMTP_USERNAME,
+                    'smtp_password': SMTP_PASSWORD
+                }
+                send_email(**email_conf)
+            logging.info(message)
         update_monitor_state(monitor.name, monitor.ok, monitor.last_check, monitor.response_time)
     return {'data': 'monitoring done'}

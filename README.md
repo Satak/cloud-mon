@@ -55,6 +55,7 @@ cron:
   - `FB_MESSAGE_SENDER_ID`
   - `SECRET` (`base64.b64encode(urandom(24)).decode()`)
   - `GOOGLE_APPLICATION_CREDENTIALS_FIREBASE`
+  - `PRODUCTION` (boolean, for firebase auth)
 
 ## `app.yaml` Deployment file
 
@@ -69,14 +70,14 @@ env_variables:
   SMTP_USERNAME: <smtp username>
   SMTP_PASSWORD: <smtp password>
   SMTP_SERVER: <smtp server>
-  TO_EMAIL: <receiver email address>
+  TO_EMAIL: <comma separated string, receiver email address(es)>
   FB_API_KEY: <Firebase API_KEY>
   FB_AUTH_DOMAIN: <Firebase AUTH_DOMAIN>
   FB_DB_URL: <Firebase DB_URL>
   FB_PROJECT_ID: <Firebase PROJECT_ID>
   FB_MESSAGE_SENDER_ID: <Firebase MESSAGE_SENDER_ID>
   SECRET: <base64 encoded random byte array>
-  GOOGLE_APPLICATION_CREDENTIALS_FIREBASE: <path to credentials>
+  PRODUCTION: True
 handlers:
 - url: /static
   static_dir: static/
