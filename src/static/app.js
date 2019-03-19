@@ -158,6 +158,11 @@ function drawBasic(name) {
     },
     vAxis: {
       title: 'Milliseconds'
+    },
+    explorer: {
+      axis: 'horizontal',
+      keepInBounds: false,
+      maxZoomIn: 8.0
     }
   }
   const chart = new google.visualization.LineChart(document.getElementById('chart_div'))
