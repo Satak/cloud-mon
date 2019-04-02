@@ -29,7 +29,7 @@ from conf import (
     TIMEOUT,
     SENDER_EMAIL,
     SMTP_SERVER,
-    TO_EMAIL,
+    RECIPIENTS,
     SENDER_EMAIL,
     NAMESPACE,
     SECRET,
@@ -293,7 +293,7 @@ def view_settings():
         'namespace': NAMESPACE,
         'sender_email': SENDER_EMAIL,
         'smtp_server': SMTP_SERVER,
-        'to_email': TO_EMAIL,
+        'recipients': RECIPIENTS,
         'timeout': TIMEOUT,
         'send_email': SEND_EMAIL
     }
